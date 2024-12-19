@@ -1,8 +1,15 @@
 import { PanInfo, motion } from "framer-motion";
+import { CardProps } from "index";
 import { useState } from "react";
-import { CardProps } from "types";
+// import { CardProps } from "types";
 
-const Card: React.FC<CardProps> = ({ card, removeCard, active }) => {
+const Card: React.FC<CardProps> = ({
+  card,
+  removeCard,
+  active,
+  activeDetailsSection,
+  setActiveDetailsSection
+}) => {
   const [leaveX, setLeaveX] = useState(0);
   const [leaveY, setLeaveY] = useState(0);
   const onDragEnd = (_e: any, info: PanInfo) => {
@@ -25,22 +32,23 @@ const Card: React.FC<CardProps> = ({ card, removeCard, active }) => {
     <>
       {active ? (
         <motion.div
+          onClick={() => setActiveDetailsSection(!activeDetailsSection)}
           drag={true}
           dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
           onDragEnd={onDragEnd}
           initial={{
-            scale: 1,
+            scale: 1
           }}
           animate={{
             scale: 1.05,
-            rotate: `${card.name.length % 2 === 0 ? 6 : -6}deg`,
+            rotate: `${card.name.length % 2 === 0 ? 6 : -6}deg`
           }}
           exit={{
             x: leaveX,
             y: leaveY,
             opacity: 0,
             scale: 0.5,
-            transition: { duration: 0.2 },
+            transition: { duration: 0.2 }
           }}
           className={classNames}
           data-testid="active-card"

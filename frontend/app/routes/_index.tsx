@@ -23,8 +23,11 @@ export default function Index() {
     superlike: 0
   });
   const [history, setHistory] = useState<HistoryType[]>([]);
-  // index of last card
+  const [activeDetailsSection, setActiveDetailsSection] =
+    useState<boolean>(false);
+
   const activeIndex = cards.length - 1;
+
   const removeCard = (oldCard: CardType, swipe: SwipeType) => {
     setHistory((current) => [...current, { ...oldCard, swipe }]);
     setCards((current) =>
@@ -34,6 +37,7 @@ export default function Index() {
     );
     setResult((current) => ({ ...current, [swipe]: current[swipe] + 1 }));
   };
+
   const undoSwipe = () => {
     const newCard = history.pop();
     if (newCard) {
@@ -51,47 +55,64 @@ export default function Index() {
     }
   };
 
+  console.log("activeDetailsSection", activeDetailsSection);
+
   return (
-    <main className="bg-blue-500 flex flex-col justify-center items-center py-10 max-h-screen">
-      <h2 className="text-white text-3xl font-semibold">Tinder cards with Framer motion</h2>
-      <div className="relative flex flex-col justify-center items-center w-full h-screen gradient">
-        {/* <Head> */}
-        {/* </Head> */}
-        <AnimatePresence>
-          {cards.map((card, index) => (
-            <Card
-              key={card.name}
-              active={index === activeIndex}
-              removeCard={removeCard}
-              card={card}
+    <main className="bg-blue-500 flex flex-col justify-center  h-screen items-center py-10 max-h-screen">
+      <h2 className="text-white text-3xl font-semibold">
+        Tinder cards with Framer motion
+      </h2>
+      <section className="flex flex-row w-full h-full">
+        <div
+          className={`relative flex flex-col justify-center items-center h-full gradient bg-red-400 transition-all duration-300 ${
+            activeDetailsSection ? "w-1/2" : "w-full"
+          }`}
+        >
+          <AnimatePresence>
+            {cards.map((card, index) => (
+              <Card
+                key={card.name}
+                active={index === activeIndex}
+                removeCard={removeCard}
+                card={card}
+                activeDetailsSection={activeDetailsSection}
+                setActiveDetailsSection={setActiveDetailsSection}
+              />
+            ))}
+          </AnimatePresence>
+          {cards.length === 0 ? (
+            <span className="text-white text-xl">End of Stack</span>
+          ) : null}
+          <footer className="absolute bottom-4 flex items-center space-x-4">
+            <div className="flex flex-col items-center space-y-2">
+              <button
+                disabled={history.length === 0}
+                className="w-14 h-14 rounded-full text-black bg-white inline-flex justify-center items-center disabled:cursor-not-allowed"
+                onClick={undoSwipe}
+                data-testid="undo-btn"
+                aria-label="Undo Swipe"
+              >
+                <RotateIcon strokeWidth={3} />
+              </button>
+              <span className="text-xs text-white">Undo</span>
+            </div>
+            <Counter label="Likes" count={result.like} testid="like-count" />
+            <Counter label="DisLikes" count={result.nope} testid="nope-count" />
+            <Counter
+              label="Superlike"
+              count={result.superlike}
+              testid="superlike-count"
             />
-          ))}
-        </AnimatePresence>
-        {cards.length === 0 ? (
-          <span className="text-white text-xl">End of Stack</span>
-        ) : null}
-        <footer className="absolute bottom-4 flex items-center space-x-4">
-          <div className="flex flex-col items-center space-y-2">
-            <button
-              disabled={history.length === 0}
-              className="w-14 h-14 rounded-full text-black bg-white inline-flex justify-center items-center disabled:cursor-not-allowed"
-              onClick={undoSwipe}
-              data-testid="undo-btn"
-              aria-label="Undo Swipe"
-            >
-              <RotateIcon strokeWidth={3} />
-            </button>
-            <span className="text-xs text-white">Undo</span>
-          </div>
-          <Counter label="Likes" count={result.like} testid="like-count" />
-          <Counter label="Nopes" count={result.nope} testid="nope-count" />
-          <Counter
-            label="Superlike"
-            count={result.superlike}
-            testid="superlike-count"
-          />
-        </footer>
-      </div>
+          </footer>
+        </div>
+        <div
+          className={`bg-yellow-200 transition-all duration-300 ${
+            activeDetailsSection ? "w-1/2" : "w-0 hidden"
+          } h-full flex flex-col justify-center items-center`}
+        >
+          <h1 className="text-black text-2xl font-semibold">Details Section</h1>
+        </div>
+      </section>
     </main>
   );
 }
